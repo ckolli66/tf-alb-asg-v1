@@ -1,0 +1,82 @@
+resource "aws_launch_template" "ec2_server" {
+  for_each               = var.app_components
+  name                   = "${each.key}-${var.env}"
+  image_id               = var.ami
+  instance_type          = each.value["instance_type"]
+  vpc_security_group_ids = [aws_security_group.ec2-app[each.key].id]
+  user_data              = file("${path.module}/install_ansible.sh")
+
+  tags = {
+	Name = "${each.key}-${var.env}"
+  }
+}
+
+resource "aws_lb_target_group" "app_target_group" {
+  for_each = var.app_components
+
+  name     = "${each.key}-${var.env}"
+  port     = each.value["ports"]["app"]
+  protocol = "HTTP"
+  vpc_id   = var.default_vpc_id
+
+  health_check {
+	path = "/health"
+  }
+
+}
+
+resource "aws_autoscaling_group" "test" {
+  for_each           = var.app_components
+  name               = "${each.key}-${var.env}"
+  availability_zones = ["us-east-1a","us-east-1b"]
+  desired_capacity   = each.value["min_nodes"]
+  max_size           = each.value["max_nodes"]
+  min_size           = each.value["min_nodes"]
+  target_group_arns = [aws_lb_target_group.app_target_group[each.key].arn]
+
+  launch_template {
+	id      = aws_launch_template.ec2_server[each.key].id
+	version = "$Latest"
+  }
+
+  depends_on = [aws_route53_record.app_cname_records]
+}
+
+## this will create load balancer's on top of app components
+resource "aws_lb" "app_instances" {
+  for_each           = var.app_components
+
+  name               = "${each.key}-${var.env}"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ec2-app[each.key].id]
+  subnets            = var.subnets
+
+  tags = {
+	Environment = "${each.key}-${var.env}"
+  }
+}
+
+##Now user request will come to load balancer so it needs to transfer to app components this below code will do that job
+## it will listen on same port as like app component
+resource "aws_lb_listener" "front_end" {
+  for_each          = var.app_components
+
+  load_balancer_arn = aws_lb.app_instances[each.key].arn
+  port              = each.value["ports"]["app"]
+  protocol          = "HTTP"
+
+  default_action {
+	type             = "forward"
+	target_group_arn = aws_lb_target_group.app_target_group[each.key].arn
+  }
+}
+
+resource "aws_route53_record" "app_cname_records" {
+  for_each = var.app_components
+  zone_id  = var.zone_id
+  name     = "${each.key}-${var.env}"
+  type     = "CNAME"
+  ttl      = 30
+  records  = [aws_lb.app_instances[each.key].dns_name]
+}

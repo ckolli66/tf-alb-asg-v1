@@ -19,5 +19,46 @@ db_components = {
   }
 }
 
-ami     = "ami-0220d79f3f480ecf5"
-zone_id = "Z06404431NXHJ1IDZF7W2"
+app_components = {
+  frontend   = {
+	min_nodes = 1
+	max_nodes = 10
+	ports = { ssh = 22 , nginx = 80 }
+	instance_type = "t3.small"
+  }
+  cart = {
+	min_nodes = 1
+	max_nodes = 10
+	ports         = { ssh = 22 , app = 8080 }
+	instance_type = "t3.small"
+  }
+  user   = {
+	min_nodes = 1
+	max_nodes = 10
+	ports = { ssh = 22 , app = 8080 }
+	instance_type = "t3.small"
+  }
+  catalogue   = {
+	min_nodes = 1
+	max_nodes = 10
+	ports = { ssh = 22 , app = 8080 }
+	instance_type = "t3.small"
+  }
+  shipping   = {
+	min_nodes = 1
+	max_nodes = 10
+	ports = { ssh = 22 , app = 8080 }
+	instance_type = "t3.small"
+  }
+  payment   = {
+	min_nodes = 1
+	max_nodes = 10
+	ports = { ssh = 22 , app = 8080 }
+	instance_type = "t3.small"
+  }
+}
+
+ami            = "ami-0220d79f3f480ecf5"
+zone_id        = "Z06404431NXHJ1IDZF7W2"
+default_vpc_id = "vpc-0f995da5da96d9248"
+subnets        = ["subnet-0ce8afa0dde986bc0", "subnet-0629872d39e431ea9"]
