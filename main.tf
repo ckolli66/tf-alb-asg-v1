@@ -7,7 +7,7 @@ resource "aws_instance" "server" {
   user_data = file("${path.module}/install_ansible.sh")
 
   tags = {
-	Name = "${var.db_components}-${var.env}"
+	Name = "${each.key}-${var.env}"
   }
 }
 
