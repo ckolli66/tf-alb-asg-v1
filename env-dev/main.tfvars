@@ -23,7 +23,7 @@ app_components = {
   frontend   = {
 	min_nodes = 1
 	max_nodes = 10
-	ports = { ssh = 22 , nginx = 80 }
+	ports = { ssh = 22 , app = 80 }
 	instance_type = "t3.small"
   }
   cart = {
