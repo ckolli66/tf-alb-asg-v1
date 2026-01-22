@@ -3,7 +3,7 @@ resource "aws_instance" "server" {
 
   ami = var.ami
   instance_type = each.value["instance_type"]
-  vpc_security_group_ids = []
+  vpc_security_group_ids = [aws_security_group.ec2[each.key].id]
   user_data = file("${path.module}/install_ansible.sh")
 
   tags = {

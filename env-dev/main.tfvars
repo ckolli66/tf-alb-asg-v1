@@ -60,5 +60,5 @@ app_components = {
 
 ami            = "ami-0220d79f3f480ecf5"
 zone_id        = "Z06404431NXHJ1IDZF7W2"
-default_vpc_id = "vpc-0f995da5da96d9248"
-subnets        = ["subnet-0ce8afa0dde986bc0", "subnet-0629872d39e431ea9"]
+default_vpc_id = "vpc-0bb05b4ce9592d0d0"
+subnets        = ["subnet-0301e9e21d6e797cf", "subnet-0edfbefd92844afcd"]

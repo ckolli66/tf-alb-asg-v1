@@ -4,7 +4,7 @@ resource "aws_launch_template" "ec2_server" {
   image_id               = var.ami
   instance_type          = each.value["instance_type"]
   vpc_security_group_ids = [aws_security_group.ec2-app[each.key].id]
-  user_data              = file("${path.module}/install_ansible.sh")
+  user_data              = base64encode(templatefile("${path.module}/install_ansible.sh", { component = each.key, env = var.env }))
 
   tags = {
 	Name = "${each.key}-${var.env}"
