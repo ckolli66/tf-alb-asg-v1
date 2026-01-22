@@ -1,7 +1,7 @@
 resource "aws_security_group" "ec2" {
   for_each = var.db_components
   name = "${each.key}-${var.env}"
-  description = "${}-${var.env}"
+  description = "${each.key}-${var.env}"
 
   dynamic "ingress" {
 	for_each = each.value["ports"]
@@ -27,7 +27,7 @@ resource "aws_security_group" "ec2" {
 resource "aws_security_group" "ec2-app" {
   for_each = var.app_components
   name = "${each.key}-${var.env}"
-  description = "${}-${var.env}"
+  description = "${each.key}-${var.env}"
 
   dynamic "ingress" {
 	for_each = each.value["ports"]
